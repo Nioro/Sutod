@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/SutodApp
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    flyway:
+      schemas:
+        - public
+      baseline-on-migrate: true
+      driver-class-name: org.postgresql.Driver
+
+server:
+  port: 8080
+
+logging:
+  level:
+    sql: info

@@ -1,0 +1,9 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+
+a:link, a:visited, a:hover, a:focus, a:active {
+  color: white; /* В указанных состояниях гиперссылка будет представлена этим цветом */
+  text-decoration: none; /* И мы исключим подчеркивание */
+}

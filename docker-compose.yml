@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sutod_postgres
+    environment:
+      POSTGRES_DB: SutodApp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1928
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Sutod_Auth/src/main/resources/db/migration:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - sutod_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d SutodApp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./Sutod_Auth
+      dockerfile: Dockerfile
+    container_name: sutod_backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/SutodApp
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1928
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: greblinbeats@gmail.com
+      SPRING_MAIL_PASSWORD: mxlq kzxe bmtf gltu
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sutod_network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: sutod_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - sutod_network
+    restart: unless-stopped
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: sutod_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sutod_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sutod_network:
+    driver: bridge
+
