@@ -128,7 +128,7 @@ public class UserController {
 
         User user = userService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if(user.getPassword().equals(passwordEncoder.encode(password1)) && !user.getPassword().equals(passwordEncoder.encode(password2))) {
+        if(passwordEncoder.matches(password1, user.getPassword()) && !user.getPassword().equals(passwordEncoder.encode(password2))) {
             user.setPassword(passwordEncoder.encode(password2));
             return ResponseEntity.ok(userRepository.save(user));
         }
